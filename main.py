@@ -3,11 +3,11 @@ import streamlit as st
 # 페이지 설정
 st.set_page_config(page_title="롤 챔피언 MBTI", page_icon="⚔️", layout="centered")
 
-# 롤 챔피언 로딩 화면 이미지 URL을 가져오는 함수 (Riot Data Dragon API)
+# 롤 챔피언 로딩 화면 이미지 URL을 가져오는 함수
 def get_lol_img(champ_id):
     return f"https://ddragon.leagueoflegends.com/cdn/img/champion/loading/{champ_id}_0.jpg"
 
-# MBTI별 찰떡 챔피언 및 궁합 데이터 (영문 id는 이미지 URL을 위해 정확해야 함)
+# MBTI별 찰떡 챔피언 및 궁합 데이터
 mbti_data = {
     "ENFJ": {"champ": "브라움", "id": "Braum", "bf": "INFP", "desc": "프렐요드의 든든한 방패 브라움! 모두를 감싸 안는 따뜻한 리더십을 가졌어요. 🛡️"},
     "ENTJ": {"champ": "스웨인", "id": "Swain", "bf": "INTP", "desc": "녹서스의 대장군 스웨인! 압도적인 카리스마와 전략으로 승리를 이끌어냅니다. 🦅"},
@@ -35,41 +35,35 @@ st.markdown("---")
 # 질문 목록
 st.subheader("🧐 협곡 심리 테스트")
 
-q1_opt1 = "한타 대승 후! 남은 적을 끝까지 추격해 마무리한다! 🏃‍♂️"
-q1_opt2 = "일단 정비가 우선! 안전하게 귀환해서 아이템부터 산다. 🏠"
-q1 = st.radio("1. 치열한 한타에서 승리했다! 나의 다음 행동은?", (q1_opt1, q1_opt2), index=None)
+q1 = st.radio("1. 치열한 한타에서 승리했다! 나의 다음 행동은?", 
+              ("한타 대승 후! 남은 적을 끝까지 추격해 마무리한다! 🏃‍♂️", "일단 정비가 우선! 안전하게 귀환해서 아이템부터 산다. 🏠"), index=None)
 
-q2_opt1 = "적 정글 동선, 쿨타임 등 팩트 기반으로 오더를 내린다. 📝"
-q2_opt2 = "'느낌 왔어! 지금 들어가면 대박이야!' 직감적으로 플레이한다. ⚡"
-q2 = st.radio("2. 게임 중 팀원들에게 오더를 내릴 때 나는?", (q2_opt1, q2_opt2), index=None)
+q2 = st.radio("2. 게임 중 팀원들에게 오더를 내릴 때 나는?", 
+              ("적 정글 동선, 쿨타임 등 팩트 기반으로 오더를 내린다. 📝", "'느낌 왔어! 지금 들어가면 대박이야!' 직감적으로 플레이한다. ⚡"), index=None)
 
-q3_opt1 = "왜 죽었어? 플래시 안 돌았어? (원인 분석 및 피드백) 📊"
-q3_opt2 = "까비 ㅠㅠ 상대가 너무 셌다. 괜찮아 할 수 있어! (위로와 격려) 🥺"
-q3 = st.radio("3. 듀오가 솔킬을 따였을 때 나의 반응은?", (q3_opt1, q3_opt2), index=None)
+q3 = st.radio("3. 듀오가 솔킬을 따였을 때 나의 반응은?", 
+              ("왜 죽었어? 플래시 안 돌았어? (원인 분석 및 피드백) 📊", "까비 ㅠㅠ 상대가 너무 셌다. 괜찮아 할 수 있어! (위로와 격려) 🥺"), index=None)
 
-q4_opt1 = "밴픽부터 아이템 트리까지 철저하게 계획대로 간다. 🗓️"
-q4_opt2 = "상대 픽과 상황을 보고 유동적으로 템트리와 전략을 바꾼다. 🗺️"
-q4 = st.radio("4. 랭크 게임을 돌릴 때 나의 플레이 스타일은?", (q4_opt1, q4_opt2), index=None)
+q4 = st.radio("4. 랭크 게임을 돌릴 때 나의 플레이 스타일은?", 
+              ("밴픽부터 아이템 트리까지 철저하게 계획대로 간다. 🗓️", "상대 픽과 상황을 보고 유동적으로 템트리와 전략을 바꾼다. 🗺️"), index=None)
 
 st.markdown("---")
 
 # 결과 확인 버튼
 if st.button("내 챔피언 & 듀오 결과 보기! 🚀"):
-    # 모든 질문에 답했는지 확인
     if not all([q1, q2, q3, q4]):
         st.warning("앗! 협곡에 입장하기 전에 4개의 질문에 모두 체크해주세요! 🔴")
     else:
-        # 승리의 풍선 효과!
         st.balloons()
         
         # MBTI 계산 로직
         my_mbti = ""
-        my_mbti += "E" if q1 == q1_opt1 else "I"
-        my_mbti += "S" if q2 == q2_opt1 else "N"
-        my_mbti += "T" if q3 == q3_opt1 else "F"
-        my_mbti += "J" if q4 == q4_opt1 else "P"
+        my_mbti += "E" if "추격" in q1 else "I"
+        my_mbti += "S" if "팩트" in q2 else "N"
+        my_mbti += "T" if "원인" in q3 else "F"
+        my_mbti += "J" if "계획" in q4 else "P"
         
-        # 내 데이터 및 듀오 데이터 가져오기
+        # 데이터 가져오기
         my_info = mbti_data[my_mbti]
         bf_mbti = my_info["bf"]
         bf_info = mbti_data[bf_mbti]
@@ -77,19 +71,21 @@ if st.button("내 챔피언 & 듀오 결과 보기! 🚀"):
         st.success(f"### 🎉 당신의 MBTI는 **{my_mbti}** 입니다!")
         st.write("---")
         
-        # 결과를 2개의 열로 나누어 시각적으로 배치
         col1, col2 = st.columns(2)
         
         with col1:
             st.markdown(f"#### 👤 나의 챔피언: **{my_info['champ']}**")
-            # 세로로 긴 로딩 일러스트 사용
-            st.image(get_lol_img(my_info["id"]), use_column_width=True)
+            # st.image 대신 HTML 태그를 사용하여 클라이언트가 직접 이미지를 로드하도록 수정
+            img_html1 = f'<img src="{get_lol_img(my_info["id"])}" style="width:100%; border-radius:15px; box-shadow: 2px 2px 10px rgba(0,0,0,0.5);">'
+            st.markdown(img_html1, unsafe_allow_html=True)
             st.info(my_info["desc"])
             
         with col2:
             st.markdown(f"#### 🤝 환상의 듀오: **{bf_info['champ']} ({bf_mbti})**")
-            st.image(get_lol_img(bf_info["id"]), use_column_width=True)
-            st.warning(f"바텀 듀오 뺨치는 최고의 호흡! {my_info['champ']}와(과) {bf_info['champ']}의 만남이에요. ✨")
+            # 절친 챔피언 이미지도 HTML로 수정
+            img_html2 = f'<img src="{get_lol_img(bf_info["id"])}" style="width:100%; border-radius:15px; box-shadow: 2px 2px 10px rgba(0,0,0,0.5);">'
+            st.markdown(img_html2, unsafe_allow_html=True)
+            st.warning(f"최고의 호흡! {my_info['champ']}와(과) {bf_info['champ']}의 만남이에요. ✨")
             
         st.markdown("---")
         st.caption("※ 챔피언 이미지는 Riot Games의 Data Dragon API를 활용하여 불러옵니다. 재미로만 즐겨주세요! GG! 🎮")
