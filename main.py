@@ -1,9 +1,9 @@
 import streamlit as st
 
-# 페이지 설정 (탭 제목과 아이콘)
+# 페이지 설정
 st.set_page_config(page_title="MBTI 소울메이트 찾기", page_icon="✨")
 
-# MBTI 궁합 데이터 (가장 잘 알려진 찰떡궁합 페어링 적용)
+# MBTI 궁합 데이터
 mbti_best_friends = {
     "ENFJ": {"bf": "INFP", "desc": "열정적인 리더와 따뜻한 몽상가의 만남! 서로의 감정을 깊이 이해해 주는 완벽한 힐링 콤비예요. 💖"},
     "ENTJ": {"bf": "INTP", "desc": "추진력 갑과 논리력 갑! 아이디어를 현실로 만드는 데 이보다 더 좋은 파트너는 없어요. 🌍"},
@@ -23,29 +23,55 @@ mbti_best_friends = {
     "ISTJ": {"bf": "ESTP", "desc": "청렴결백한 논리주의자와 모험을 즐기는 사업가! 원칙적인 내 삶에 신선한 자극을 주는 멋진 친구랍니다. 🎢"}
 }
 
-# 앱 헤더 및 설명
-st.title("✨ 나의 MBTI 소울메이트 찾기 🔍")
-st.write("내 MBTI를 선택하면, 찰떡궁합인 **운명의 절친**을 알려드려요! 🎈")
+# 앱 헤더
+st.title("✨ 나의 MBTI & 소울메이트 찾기 🔍")
+st.write("내 MBTI를 몰라도 괜찮아요! 딱 4개의 질문에 답하면, 숨겨진 나의 MBTI와 **운명의 절친**을 알려드려요! 🎈")
 st.markdown("---")
 
-# MBTI 선택 드롭다운 (selectbox)
-mbti_list = list(mbti_best_friends.keys())
-user_mbti = st.selectbox("👉 당신의 MBTI는 무엇인가요?", mbti_list, index=None, placeholder="MBTI를 선택해주세요!")
+# 질문 목록 (index=None 으로 기본 선택값 없음 처리)
+st.subheader("🧐 나를 알아보는 4가지 질문")
+
+q1_opt1 = "밖으로 나가서 친구들과 신나게 놀며 에너지를 얻는다! 🏃‍♂️"
+q1_opt2 = "집이 최고! 조용히 뒹굴거리며 나만의 시간을 보내야 에너지가 충전된다. 🏠"
+q1 = st.radio("1. 주말에 꿀 같은 자유시간이 생겼다! 나는?", (q1_opt1, q1_opt2), index=None)
+
+q2_opt1 = "있는 그대로, 세세한 사실과 경험을 바탕으로 설명한다. 📝"
+q2_opt2 = "비유와 상상을 섞어가며, 전체적인 느낌과 의미 위주로 설명한다. ☁️"
+q2 = st.radio("2. 친구에게 어제 본 영화를 설명할 때 나는?", (q2_opt1, q2_opt2), index=None)
+
+q3_opt1 = "무슨 화분 샀어? 물은 얼마나 줘야 해? (원인 파악 및 해결책) 🪴"
+q3_opt2 = "왜 우울해 ㅠㅠ 무슨 일 있었어? (감정 공감 및 위로) 🥺"
+q3 = st.radio("3. 친구가 '나 우울해서 화분 샀어'라고 한다면 나의 반응은?", (q3_opt1, q3_opt2), index=None)
+
+q4_opt1 = "시간 단위로 계획을 철저하게 세워야 마음이 편하다. 🗓️"
+q4_opt2 = "발길 닿는 대로! 융통성 있게 즉흥적으로 돌아다닌다. 🗺️"
+q4 = st.radio("4. 기대하던 여행을 떠날 때 나는?", (q4_opt1, q4_opt2), index=None)
+
+st.markdown("---")
 
 # 결과 확인 버튼
-if st.button("내 절친 찾기! 🚀"):
-    if user_mbti is None:
-        st.warning("앗! MBTI를 먼저 선택해주세요. 🤔")
+if st.button("내 MBTI & 절친 결과 보기! 🚀"):
+    # 모든 질문에 답했는지 확인
+    if not all([q1, q2, q3, q4]):
+        st.warning("앗! 4개의 질문에 모두 체크해주세요! 🤔")
     else:
-        # 재미있는 풍선 효과!
+        # 풍선 이펙트 팡팡!
         st.balloons()
         
+        # MBTI 계산 로직
+        my_mbti = ""
+        my_mbti += "E" if q1 == q1_opt1 else "I"
+        my_mbti += "S" if q2 == q2_opt1 else "N"
+        my_mbti += "T" if q3 == q3_opt1 else "F"
+        my_mbti += "J" if q4 == q4_opt1 else "P"
+        
         # 결과 데이터 가져오기
-        bf_info = mbti_best_friends[user_mbti]
+        bf_info = mbti_best_friends[my_mbti]
         
-        # 결과 출력
-        st.markdown(f"### 🎉 **{user_mbti}**의 찰떡궁합 절친은 바로 **{bf_info['bf']}**입니다!")
-        st.success(bf_info['desc'])
+        # 결과 출력 (성공 메시지 박스 활용)
+        st.success(f"### 🎉 당신의 MBTI는 **{my_mbti}** 이군요!")
+        st.write("그리고...")
+        st.info(f"#### 찰떡궁합 운명의 절친은 바로 **{bf_info['bf']}** 입니다! 🤝")
+        st.write(f"> **{bf_info['desc']}**")
         
-        # 추가 꾸밈 요소
-        st.caption("※ 궁합은 재미로만 봐주세요! 세상의 모든 친구 관계는 소중하니까요 🥰")
+        st.caption("※ 이 결과는 단 4문항으로 측정한 미니 테스트이므로 재미로만 즐겨주세요! 🥰")
