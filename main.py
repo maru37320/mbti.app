@@ -1,11 +1,20 @@
 import streamlit as st
+import urllib.request
 
 # 페이지 설정
 st.set_page_config(page_title="롤 챔피언 MBTI", page_icon="⚔️", layout="centered")
 
-# 롤 챔피언 로딩 화면 이미지 URL을 가져오는 함수
-def get_lol_img(champ_id):
-    return f"https://ddragon.leagueoflegends.com/cdn/img/champion/loading/{champ_id}_0.jpg"
+# 🌟 핵심 포인트: 라이엇 서버의 차단을 피하는 이미지 다운로드 함수
+@st.cache_data(show_spinner=False)
+def get_champ_image(champ_id):
+    url = f"https://ddragon.leagueoflegends.com/cdn/img/champion/loading/{champ_id}_0.jpg"
+    try:
+        # 일반 사용자의 웹 브라우저인 것처럼 위장(User-Agent 헤더 추가)
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+        with urllib.request.urlopen(req) as response:
+            return response.read() # 이미지 데이터를 가져옴
+    except Exception:
+        return None # 실패할 경우 예외 처리
 
 # MBTI별 찰떡 챔피언 및 궁합 데이터
 mbti_data = {
@@ -75,17 +84,22 @@ if st.button("내 챔피언 & 듀오 결과 보기! 🚀"):
         
         with col1:
             st.markdown(f"#### 👤 나의 챔피언: **{my_info['champ']}**")
-            # st.image 대신 HTML 태그를 사용하여 클라이언트가 직접 이미지를 로드하도록 수정
-            img_html1 = f'<img src="{get_lol_img(my_info["id"])}" style="width:100%; border-radius:15px; box-shadow: 2px 2px 10px rgba(0,0,0,0.5);">'
-            st.markdown(img_html1, unsafe_allow_html=True)
+            # 우회해서 받아온 이미지 출력
+            my_img = get_champ_image(my_info["id"])
+            if my_img:
+                st.image(my_img, use_container_width=True)
+            else:
+                st.error("이미지를 불러오지 못했습니다.")
             st.info(my_info["desc"])
             
         with col2:
             st.markdown(f"#### 🤝 환상의 듀오: **{bf_info['champ']} ({bf_mbti})**")
-            # 절친 챔피언 이미지도 HTML로 수정
-            img_html2 = f'<img src="{get_lol_img(bf_info["id"])}" style="width:100%; border-radius:15px; box-shadow: 2px 2px 10px rgba(0,0,0,0.5);">'
-            st.markdown(img_html2, unsafe_allow_html=True)
+            bf_img = get_champ_image(bf_info["id"])
+            if bf_img:
+                st.image(bf_img, use_container_width=True)
+            else:
+                st.error("이미지를 불러오지 못했습니다.")
             st.warning(f"최고의 호흡! {my_info['champ']}와(과) {bf_info['champ']}의 만남이에요. ✨")
             
         st.markdown("---")
-        st.caption("※ 챔피언 이미지는 Riot Games의 Data Dragon API를 활용하여 불러옵니다. 재미로만 즐겨주세요! GG! 🎮")
+        st.caption("※ 챔피언 이미지는 Riot Games API를 활용했습니다. 재미로만 즐겨주세요! GG! 🎮")
